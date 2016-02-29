@@ -3,12 +3,11 @@
 #  - gestione errori di connessione
 #  - barra di progresso del download con velocità e tempo rimanente (ttk.Progressbar)
 #       troppo difficile per ora, serve fare multithreading per non bloccare la GUI
-#  - salvataggio della cartella di download (si suppone in file esterno)
 # documentazione pafy: http://pythonhosted.org/pafy/
 # link per provare: https://www.youtube.com/watch?v=WKn6javQIqY
 # https://www.youtube.com/watch?v=0gCWPvRZcsI
 
-import ssl #utile per gestione errori di connessione (?)
+import ssl  # utile per gestione errori di connessione (?)
 import pafy
 from hurry.filesize import size
 import tkinter
@@ -18,10 +17,18 @@ from tkinter import ttk
 root = tkinter.Tk()
 global save_folder
 save_folder = tkinter.StringVar()
+global folder_file
+try:
+    open('download_folder.txt','r+')
+except FileNotFoundError:
+    folder_file = open('download_folder.txt', 'w+')
 
 
-def save_folder_set(): #forse non necessaria, da controllare
+def save_folder_set():  # forse non necessaria, da controllare
+    folder_file = open('download_folder.txt', 'w+')
     save_folder.set(askdirectory())
+    folder_file.write(save_folder.get())
+    folder_file.close()
 
 
 def download_gui():
@@ -71,6 +78,9 @@ def download_gui():
             # vedere la struttura delle informazioni sul video
             y += 1
     # gestione cartella di salvataggio
+    folder_file = open('download_folder.txt', 'r+')
+    save_folder.set(folder_file.read())
+    folder_file.close()
     save_folder_entry = tkinter.Entry(
         download_window, textvariable=save_folder)
     save_folder_entry.grid(row=y + 3, columnspan=4)
